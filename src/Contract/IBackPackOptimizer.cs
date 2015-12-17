@@ -1,10 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using DataProviders.Contract;
 
 namespace BackPackOptimizer.Contract
 {
     public interface IBackpackOptimizer
     {
-        Purchases Solve(IEnumerable<Merchendise> merchendises, int backpackSize);
+        Task<Purchases> Solve(IEnumerable<Merchendise> merchendises, int backpackSize);
     }
 }

@@ -45,6 +45,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="IBackpackOptimizer.cs" />
+    <Compile Include="IExecutionContext.cs" />
+    <Compile Include="ProgressInfo.cs" />
     <Compile Include="Purchase.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Purchases.cs" />
