@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using BackPackOptimizer.Contract;
+using Castle.MicroKernel;
 using Castle.Windsor;
 using Castle.Windsor.Installer;
 
@@ -20,21 +23,48 @@ namespace BackPackOptimizer.Clients.Console
             public string CsvFilePath;
             public int NumGallons;
         }
-
-        static IWindsorContainer _container;
-
+        
         static void Main(string[] args)
         {
-            ConfigureIoC();
-
-            var argsuments = ReadArguments(args);
-
-            if (argsuments.Item1)
+            using (var container = ConfigureIoC())
             {
-                System.Console.WriteLine($"{argsuments.Item2.CsvFilePath}, {argsuments.Item2.NumGallons}");
+                var argsuments = ReadArguments(args);                
+
+                if (argsuments.Item1)
+                {
+                    var stpw = new Stopwatch();
+                    var app = container.Resolve<BpOptimizerApp>(new Arguments(new { filePath = argsuments.Item2.CsvFilePath, backpackSize = argsuments.Item2.NumGallons }));
+                    var execContext = container.Resolve<IExecutionContext>();
+                    try
+                    {
+                        System.Console.WriteLine(
+                            $"Optimizing {Path.GetFileName(argsuments.Item2.CsvFilePath)} for {argsuments.Item2.NumGallons} gallons");
+
+                        stpw.Start();
+                        var percases = app.Run().Result;
+                        execContext.CancelSource.Cancel();
+                        stpw.Stop();
+
+                        System.Console.WriteLine($"Optimization took {stpw.Elapsed.ToString("hh:mm:ss.fff")}");
+                        PrintResult(percases);
+                    }
+                    finally
+                    {
+                        container.Release(execContext);
+                        container.Release(app);
+                    }
+                }
             }
         }
-        
+
+        static void PrintResult(Purchases p)
+        {
+            System.Console.WriteLine(
+                $"Optimal purchases for {p.NumberOfGallons} with average price {p.AveragePriceOfGallon.ToString("#.##")} are:");
+            foreach (var m in p.Merchendises)
+                System.Console.WriteLine(m);
+        }
+
         static Tuple<bool, ProgramArguments> ReadArguments(string[] args)
         {
             if (args.Length != 2)
@@ -76,11 +106,11 @@ namespace BackPackOptimizer.Clients.Console
             );
         }
 
-        static void ConfigureIoC()
+        static IWindsorContainer ConfigureIoC()
         {
-            _container = new WindsorContainer();
-            _container.Install(new[] { FromAssembly.This()});
-            
+            var container = new WindsorContainer();
+            container.Install(new[] { FromAssembly.This()});
+            return container;
         }
     }
 }

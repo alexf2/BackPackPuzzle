@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Threading;
 using System.Threading.Tasks;
 using BackPackOptimizer.Contract;
 using DataProviders.Contract;
@@ -20,7 +19,7 @@ namespace BackPackOptimizer.Runtime
             if (backpackSize < 1)
                 throw new ArgumentOutOfRangeException($"{nameof(backpackSize)} should be greater then zero");
 
-            return null;
+            return await Task.FromResult(CreateFullPurchase(merchendises));
         }
     }
 }

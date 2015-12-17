@@ -6,6 +6,6 @@ namespace BackPackOptimizer.Contract
     public interface IExecutionContext
     {
         IProgress<ProgressInfo> ProgressCallback { get; }
-        CancellationToken Token { get; }
+        CancellationTokenSource CancelSource { get; }
     }
 }

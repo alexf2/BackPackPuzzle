@@ -16,7 +16,7 @@ namespace BackPackOptimizer.Clients.Console
 
         public IProgress<ProgressInfo> ProgressCallback => this;
 
-        public CancellationToken Token => _cancelScr.Token;
+        public CancellationTokenSource CancelSource => _cancelScr;
 
         public void Report(ProgressInfo value)
         {
@@ -24,14 +24,10 @@ namespace BackPackOptimizer.Clients.Console
             System.Console.WriteLine($"{percent}%: {value.Iteration} of {value.TotalIterations}");
         }
 
+        public bool CancelledByUser { get; private set; }
+
         public void StartReading()
         {
-            while (true)
-            {
-                var keyInfo = System.Console.ReadKey();
-                if (keyInfo.Key == ConsoleKey.X) break;
-            }
-
             var cancelWatcher = new ConsoleCancelEventHandler((sender, args) => {
                 _cancelScr.Cancel();
                 args.Cancel = true;
@@ -40,12 +36,15 @@ namespace BackPackOptimizer.Clients.Console
 
             Task.Factory.StartNew(() =>
             {                
-                while (!Token.IsCancellationRequested)
+                while (!_cancelScr.Token.IsCancellationRequested)
                 {
                     if (System.Console.KeyAvailable && System.Console.ReadKey().Key == ConsoleKey.Q)
+                    {
+                        CancelledByUser = true;
                         _cancelScr.Cancel();
+                    }
                     else
-                        Task.Delay(200, Token).Wait();
+                        Task.Delay(200, _cancelScr.Token).Wait();
                 }
 
                 

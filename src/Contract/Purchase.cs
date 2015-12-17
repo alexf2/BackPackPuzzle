@@ -19,7 +19,7 @@ namespace BackPackOptimizer.Contract
             return obj is Purchase && Equals((Purchase)obj);
         }
 
-        public override string ToString() => $"{NumberOfGallons} gallons from '{SourceName}'";
+        public override string ToString() => $"{NumberOfGallons} gallons from '{SourceName}', with price {PriceOfGallon.ToString("#.##")}";
         #endregion Object
 
         #region Operators
