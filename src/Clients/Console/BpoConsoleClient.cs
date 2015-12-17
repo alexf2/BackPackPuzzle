@@ -4,9 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BackPackOptimizer.Runtime
+namespace BackPackOptimizer.Clients.Console
 {
-    public class Class1
+    class BpoConsoleClient
     {
+        static void Main(string[] args)
+        {
+        }
     }
 }

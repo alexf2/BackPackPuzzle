@@ -1,18 +1,44 @@
-﻿using Wintellect.PowerCollections;
+﻿using System;
+using System.Diagnostics;
+using System.Linq;
+using Wintellect.PowerCollections;
 
 namespace BackPackOptimizer.Contract
 {
     public sealed class Purchases
     {
-        public Purchases(int ng, OrderedBag<Purchase> pc, float avgP)
+        public Purchases(OrderedBag<Purchase> merchendises)
         {
-            NumberOfGallons = ng;
-            Merchendises = pc;
-            AveragePriceOfGallon = avgP;
+            if (merchendises == null)
+                throw new ArgumentNullException(nameof(merchendises));
+
+            Merchendises = merchendises;            
         }
 
-        public int NumberOfGallons { get; private set; }
+        int? _numberOfGallons;
+        public int NumberOfGallons
+        {
+            get
+            {
+                if (_numberOfGallons == null)
+                    _numberOfGallons = Merchendises.Sum(pc => pc.NumberOfGallons);
+
+                return _numberOfGallons.Value;
+            }            
+        }
+
         public OrderedBag<Purchase> Merchendises { get; private set; }
-        public float AveragePriceOfGallon { get; private set; }
+
+        float? _averagePriceOfGallon;
+        public float AveragePriceOfGallon
+        {
+            get
+            {
+                if (_averagePriceOfGallon == null)
+                    _averagePriceOfGallon = (float)Merchendises.Average(pc => pc.PriceOfGallon);
+
+                return _averagePriceOfGallon.Value;
+            }
+        }
     }
 }
