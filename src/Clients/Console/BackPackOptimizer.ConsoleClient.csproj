@@ -32,6 +32,9 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject>BackPackOptimizer.Clients.Console.BpoConsoleClient</StartupObject>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="Castle.Core">
       <HintPath>..\..\..\libs\Castle.Core.3.3.0\lib\net45\Castle.Core.dll</HintPath>

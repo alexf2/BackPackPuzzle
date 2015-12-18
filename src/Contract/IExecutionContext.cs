@@ -7,5 +7,6 @@ namespace BackPackOptimizer.Contract
     {
         IProgress<ProgressInfo> ProgressCallback { get; }
         CancellationTokenSource CancelSource { get; }
+        void StartReading();
     }
 }

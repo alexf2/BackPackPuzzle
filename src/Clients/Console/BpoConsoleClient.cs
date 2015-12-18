@@ -1,12 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using BackPackOptimizer.Contract;
 using Castle.MicroKernel;
+using Castle.MicroKernel.Registration;
 using Castle.Windsor;
 using Castle.Windsor.Installer;
 
@@ -17,24 +15,57 @@ namespace BackPackOptimizer.Clients.Console
         const int BadArgs = -1;
         const int NoFile = -2;
         const int BadSize = -3;
+        const int GenericException = -100;
 
-        struct ProgramArguments
+        internal sealed class ProgramArguments
         {
             public string CsvFilePath;
             public int NumGallons;
         }
         
-        static void Main(string[] args)
+        public static void Main(string[] args)
+        {
+            try
+            {
+                ExecuteCompositionRoot(args);
+            }
+            catch (TaskCanceledException ex)
+            {
+                System.Console.WriteLine(ex.Message);
+            }
+            catch (AggregateException ex)
+            {
+                ex.Handle(e =>
+                {
+                    if (e is TaskCanceledException)
+                        System.Console.WriteLine(e.Message);
+                    else
+                        System.Console.WriteLine(ex);
+                    return true;
+                });
+            }
+            catch (Exception ex)
+            {
+                Environment.ExitCode = GenericException;
+                System.Console.WriteLine(ex);
+            }
+        }
+
+        static void ExecuteCompositionRoot(string[] args)
         {
             using (var container = ConfigureIoC())
             {
-                var argsuments = ReadArguments(args);                
+                var argsuments = ReadArguments(args);
+                container.Register(Component.For<ProgramArguments>().Instance(argsuments.Item2).LifestyleSingleton());
 
                 if (argsuments.Item1)
                 {
                     var stpw = new Stopwatch();
+
                     var app = container.Resolve<BpOptimizerApp>(new Arguments(new { filePath = argsuments.Item2.CsvFilePath, backpackSize = argsuments.Item2.NumGallons }));
                     var execContext = container.Resolve<IExecutionContext>();
+                    execContext.StartReading();
+
                     try
                     {
                         System.Console.WriteLine(
@@ -45,7 +76,7 @@ namespace BackPackOptimizer.Clients.Console
                         execContext.CancelSource.Cancel();
                         stpw.Stop();
 
-                        System.Console.WriteLine($"Optimization took {stpw.Elapsed.ToString("hh:mm:ss.fff")}");
+                        System.Console.WriteLine($"Optimization took {stpw.Elapsed.ToString("hh\\:mm\\:ss\\.fff")}");
                         PrintResult(percases);
                     }
                     finally
@@ -62,7 +93,7 @@ namespace BackPackOptimizer.Clients.Console
             System.Console.WriteLine(
                 $"Optimal purchases for {p.NumberOfGallons} with average price {p.AveragePriceOfGallon.ToString("#.##")} are:");
             foreach (var m in p.Merchendises)
-                System.Console.WriteLine(m);
+                System.Console.WriteLine($"\t{m}");
         }
 
         static Tuple<bool, ProgramArguments> ReadArguments(string[] args)

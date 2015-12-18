@@ -3,7 +3,7 @@ using DataAnnotationsExtensions;
 
 namespace DataProviders.Contract
 {
-    public struct Merchendise
+    public sealed class Merchendise
     {
         [Required]
         public string Name { get; set; }

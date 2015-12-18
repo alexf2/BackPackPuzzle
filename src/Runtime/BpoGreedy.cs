@@ -19,7 +19,7 @@ namespace BackPackOptimizer.Runtime
             if (backpackSize < 1)
                 throw new ArgumentOutOfRangeException($"{nameof(backpackSize)} should be greater then zero");
 
-            return await Task.FromResult(CreateFullPurchase(merchendises));
+            return await Task.FromResult(CreateFullPurchasing(merchendises));
         }
     }
 }

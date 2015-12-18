@@ -20,7 +20,7 @@ namespace BackPackOptimizer.Clients.Console
 
         public void Report(ProgressInfo value)
         {
-            long percent = value.TotalIterations < 0 ? 100 / value.TotalIterations * value.Iteration:100;
+            long percent = (long)(value.TotalIterations > 0 ? 100M / (decimal)value.TotalIterations * (decimal)value.Iteration:100M);
             System.Console.WriteLine($"{percent}%: {value.Iteration} of {value.TotalIterations}");
         }
 
@@ -38,7 +38,7 @@ namespace BackPackOptimizer.Clients.Console
             {                
                 while (!_cancelScr.Token.IsCancellationRequested)
                 {
-                    if (System.Console.KeyAvailable && System.Console.ReadKey().Key == ConsoleKey.Q)
+                    if (System.Console.KeyAvailable && System.Console.ReadKey(true).Key == ConsoleKey.Q)
                     {
                         CancelledByUser = true;
                         _cancelScr.Cancel();
