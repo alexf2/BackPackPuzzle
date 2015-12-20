@@ -20,8 +20,15 @@ namespace BackPackOptimizer.Clients.Console
 
         public void Report(ProgressInfo value)
         {
-            long percent = (long)(value.TotalIterations > 0 ? 100M / (decimal)value.TotalIterations * (decimal)value.Iteration:100M);
-            System.Console.WriteLine($"{percent}%: {value.Iteration} of {value.TotalIterations}");
+            if (!string.IsNullOrEmpty(value.CustomMessage))
+                System.Console.WriteLine(value.CustomMessage);
+            else
+            {
+                long percent =
+                    (long)(value.TotalIterations > 0 ? 
+                            100M/(decimal) value.TotalIterations*(decimal) value.Iteration : 100M);
+                System.Console.WriteLine($"{percent}%: {value.Iteration} of {value.TotalIterations}");
+            }
         }
 
         public bool CancelledByUser { get; private set; }

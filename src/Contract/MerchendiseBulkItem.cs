@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using DataProviders.Contract;
+using System.Collections;
+using System.Runtime.InteropServices;
 
 namespace BackPackOptimizer.Contract
 {
@@ -14,10 +16,13 @@ namespace BackPackOptimizer.Contract
             _m = m;
         }
 
+        
         public Merchendise Merchendise => _m;
 
         int? _subItemsCount;
         public int SubItemsCount => _subItemsCount ?? (_subItemsCount = (_m.Size - _m.MinSize)/_m.IncrementStep + 1).Value;
+
+        public static MerchendiseBulkItem[] ToBulkItems(IEnumerable<Merchendise> m) => m.Select(item => new MerchendiseBulkItem(item)).ToArray();
 
         public int GetNthVolumeGallons(int i)
         {
@@ -32,7 +37,30 @@ namespace BackPackOptimizer.Contract
             return GetNthVolumeGallons(i) * _m.AvgPrice;
         }
 
-        public static MerchendiseBulkItem[] ToBulkItems(IEnumerable<Merchendise> m) => m.Select(item => new MerchendiseBulkItem(item)).ToArray();
+        #region Comparing
+        static int CostOrderCmp (MerchendiseBulkItem o1, MerchendiseBulkItem o2)
+        {
+            if (o1 == null)
+                return o2 == null ? 0 : -1;
+            else if (o2 == null)
+                return 1;
+
+            return o1._m.AvgPrice.CompareTo(o2._m.AvgPrice);
+        }
+        public static Comparison<MerchendiseBulkItem> CostOrder => CostOrderCmp;
+
+        static int CostOrderCmpDesc(MerchendiseBulkItem o1, MerchendiseBulkItem o2)
+        {
+            if (o2 == null)
+                return o1 == null ? 0 : -1;
+            else if (o1 == null)
+                return 1;
+
+            return o2._m.AvgPrice.CompareTo(o1._m.AvgPrice);
+        }
+        public static Comparison<MerchendiseBulkItem> CostOrderDesc => CostOrderCmpDesc;
+        #endregion Comparing
+
 
         public static void CartesianProductIteration(MerchendiseBulkItem[] arr, int[] indexes, Func<int[], bool> callback)
         {            

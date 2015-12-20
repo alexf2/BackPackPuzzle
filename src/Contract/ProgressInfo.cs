@@ -4,5 +4,6 @@
     {
         public long Iteration { get; set; }
         public long TotalIterations { get; set; }
+        public string CustomMessage { get; set; }
     }
 }

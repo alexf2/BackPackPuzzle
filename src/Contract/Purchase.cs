@@ -18,7 +18,7 @@ namespace BackPackOptimizer.Contract
         #region Object
         public override int GetHashCode()
         {
-            return 381 ^ (SourceName ?? string.Empty).GetHashCode() ^ NumberOfGallons;
+            return 381 ^ (SourceName ?? string.Empty).GetHashCode();
         }
 
         public override bool Equals(object obj)
@@ -61,7 +61,7 @@ namespace BackPackOptimizer.Contract
                 return SourceName == null ? 1 : -1;
             
 
-            return NumberOfGallons.CompareTo(other.NumberOfGallons);
+            return string.Compare(SourceName, other.SourceName, StringComparison.Ordinal);
         }
         #endregion IComparable<T>
 
@@ -78,7 +78,7 @@ namespace BackPackOptimizer.Contract
         #region Equatable<T>
         public bool Equals(Purchase val)
         {
-            return SourceName == val.SourceName && NumberOfGallons == val.NumberOfGallons;
+            return string.Equals(SourceName, val.SourceName, StringComparison.Ordinal);
         }
         #endregion Equatable<T>  
     }

@@ -26,6 +26,9 @@ namespace BackPackOptimizer.Runtime
             //return await CreateTestTask(merchendises);
 
             MerchendiseBulkItem[] items = MerchendiseBulkItem.ToBulkItems(merchendises);
+            var instantPurchases = TryInstantSolution(items, requiredGallons);
+            if (instantPurchases != null) //the task is either: has an obvious solution or doesn't have any solution
+                return Task.FromResult(instantPurchases);
 
             return Task<Purchases>.Factory.StartNew(() =>
             {

@@ -28,6 +28,25 @@ namespace BackPackOptimizer.Runtime
             return new Purchases(bag);
         }
 
+        protected Purchases TryInstantSolution(IEnumerable<MerchendiseBulkItem> items, int requiredGallons)
+        {
+            int totalGallons = items.Sum(i => i.Merchendise.Size);
+
+            if (totalGallons < requiredGallons)
+                return new Purchases(new OrderedBag<Purchase>()); //no solution
+
+            if (totalGallons == requiredGallons)
+            {
+                var bag = new OrderedBag<Purchase>();
+                foreach(var item in items)
+                    bag.Add(new Purchase(item, item.SubItemsCount - 1));
+
+                return new Purchases(bag);
+            }
+
+            return null;
+        }
+
         protected Task<Purchases> CreateTestTask(IEnumerable<Merchendise> merchendises)
         {
             var m = merchendises.ToArray();            
@@ -50,6 +69,11 @@ namespace BackPackOptimizer.Runtime
         protected void NotifyProgress(long iteration, long totalIterations)
         {
             _progress?.Report(new ProgressInfo {Iteration = iteration, TotalIterations = totalIterations});
+        }
+
+        protected void NotifyProgress(string msg)
+        {
+            _progress?.Report(new ProgressInfo { CustomMessage = msg});
         }
 
         protected static long CalculateNotifyStep(long totalTaskSize)

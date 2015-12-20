@@ -69,8 +69,7 @@ namespace BackPackOptimizer.Clients.Console
 
                     try
                     {
-                        System.Console.WriteLine(
-                            $"Optimizing {Path.GetFileName(argsuments.Item2.CsvFilePath)} for {argsuments.Item2.NumGallons} gallons");
+                        System.Console.WriteLine($"Optimizing {Path.GetFileName(argsuments.Item2.CsvFilePath)} for {argsuments.Item2.NumGallons} gallons");
 
                         stpw.Start();
                         var percases = app.Run().Result;
@@ -97,7 +96,7 @@ namespace BackPackOptimizer.Clients.Console
             else
             {
                 System.Console.WriteLine(
-                    $"Optimal purchases for {p.NumberOfGallons} with average price {p.AveragePriceOfGallon.ToString("#.##")} are:");
+                    $"Optimal purchases for {requestedGallons} gallons: {p.NumberOfGallons} with average price {p.AveragePriceOfGallon.ToString("#.##")} are:");
                 foreach (var m in p.Merchendises)
                     System.Console.WriteLine($"\t{m}");
             }
