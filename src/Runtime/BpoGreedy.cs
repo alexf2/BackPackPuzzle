@@ -29,7 +29,7 @@ namespace BackPackOptimizer.Runtime
                 return Task.FromResult(instantPurchases);
             
 
-                long notifyStep = CalculateNotifyStep(items.Length);
+            long notifyStep = CalculateNotifyStep(items.Length);
             NotifyProgress("Sorting...");
             Array.Sort(items, MerchendiseBulkItem.CostOrder);
 
@@ -64,6 +64,7 @@ namespace BackPackOptimizer.Runtime
                 if (resSet.Sum(item => item.NumberOfGallons) < requiredGallons)
                     resSet.Clear();
 
+                FinalNotify();
                 return new Purchases(resSet);
 
             }, _cancelToken);

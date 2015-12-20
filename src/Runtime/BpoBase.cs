@@ -15,6 +15,8 @@ namespace BackPackOptimizer.Runtime
 
         protected readonly IProgress<ProgressInfo> _progress;
         protected readonly CancellationToken _cancelToken;
+        bool _lastNotify100;
+        long _lastTotal;
 
         protected BpoBase(IExecutionContext context)
         {            
@@ -68,7 +70,19 @@ namespace BackPackOptimizer.Runtime
 
         protected void NotifyProgress(long iteration, long totalIterations)
         {
+            if (!_lastNotify100)
+            {
+                _lastNotify100 = iteration >= totalIterations;
+                _lastTotal = totalIterations;
+            }
+
             _progress?.Report(new ProgressInfo {Iteration = iteration, TotalIterations = totalIterations});
+        }
+
+        protected void FinalNotify()
+        {
+            if (!_lastNotify100)
+                _progress?.Report(new ProgressInfo { Iteration = _lastTotal, TotalIterations = _lastTotal });
         }
 
         protected void NotifyProgress(string msg)

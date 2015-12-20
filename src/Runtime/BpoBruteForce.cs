@@ -50,9 +50,8 @@ namespace BackPackOptimizer.Runtime
 
                 long iterCount = 0;
                 foreach (var combinationIdx in mainIter.Iterate())
-                {
-                    iterCount++;
-                    if (iterCount % notifyStep == 0)
+                {                    
+                    if (++iterCount % notifyStep == 0)
                         NotifyProgress(iterCount, totalIterations);
 
                     _cancelToken.ThrowIfCancellationRequested();                    
@@ -79,7 +78,9 @@ namespace BackPackOptimizer.Runtime
                 if (solutionItemIndexes != null)
                     FillPurchasesSet(resSet, items, solutionItemIndexes, solutionItemSubIndexes);
 
+                FinalNotify();
                 return new Purchases(resSet);
+
             }, _cancelToken);            
         }
 

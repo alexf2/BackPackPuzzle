@@ -96,7 +96,7 @@ namespace BackPackOptimizer.Clients.Console
             else
             {
                 System.Console.WriteLine(
-                    $"Optimal purchases for {requestedGallons} gallons: {p.NumberOfGallons} with average price {p.AveragePriceOfGallon.ToString("#.##")} are:");
+                    $"Optimal purchases for {requestedGallons} gallons: {p.TotalGallons} with average price {p.AveragePriceOfGallon.ToString("#.##")} and total cost {p.TotalCost.ToString("#.##")} are:");
                 foreach (var m in p.Merchendises)
                     System.Console.WriteLine($"\t{m}");
             }
