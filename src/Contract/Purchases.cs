@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Diagnostics;
 using System.Linq;
 using Wintellect.PowerCollections;
 
@@ -16,29 +15,11 @@ namespace BackPackOptimizer.Contract
         }
 
         int? _numberOfGallons;
-        public int NumberOfGallons
-        {
-            get
-            {
-                if (_numberOfGallons == null)
-                    _numberOfGallons = Merchendises.Sum(pc => pc.NumberOfGallons);
-
-                return _numberOfGallons.Value;
-            }            
-        }
+        public int NumberOfGallons => _numberOfGallons ?? (_numberOfGallons = Merchendises.Sum(pc => pc.NumberOfGallons)).Value;
 
         public OrderedBag<Purchase> Merchendises { get; private set; }
 
-        float? _averagePriceOfGallon;
-        public float AveragePriceOfGallon
-        {
-            get
-            {
-                if (_averagePriceOfGallon == null)
-                    _averagePriceOfGallon = (float)Merchendises.Average(pc => pc.PriceOfGallon);
-
-                return _averagePriceOfGallon.Value;
-            }
-        }
+        double? _averagePriceOfGallon;
+        public double AveragePriceOfGallon => _averagePriceOfGallon ?? (_averagePriceOfGallon = Merchendises.Average(pc => pc.PriceOfGallon)).Value;
     }
 }

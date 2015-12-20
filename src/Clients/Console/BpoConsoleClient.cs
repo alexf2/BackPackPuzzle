@@ -56,15 +56,17 @@ namespace BackPackOptimizer.Clients.Console
             using (var container = ConfigureIoC())
             {
                 var argsuments = ReadArguments(args);
-                container.Register(Component.For<ProgramArguments>().Instance(argsuments.Item2).LifestyleSingleton());
-
+                
                 if (argsuments.Item1)
                 {
+                    //publishing arguments to IoC container
+                    container.Register(Component.For<ProgramArguments>().Instance(argsuments.Item2).LifestyleSingleton());
+
                     var stpw = new Stopwatch();
 
-                    var app = container.Resolve<BpOptimizerApp>(new Arguments(new { filePath = argsuments.Item2.CsvFilePath, backpackSize = argsuments.Item2.NumGallons }));
+                    var app = container.Resolve<BpOptimizerApp>(new { filePath = argsuments.Item2.CsvFilePath, backpackSize = argsuments.Item2.NumGallons });
                     var execContext = container.Resolve<IExecutionContext>();
-                    execContext.StartReading();
+                    execContext.StartReading(); //starting keyboard control
 
                     try
                     {
@@ -77,7 +79,7 @@ namespace BackPackOptimizer.Clients.Console
                         stpw.Stop();
 
                         System.Console.WriteLine($"Optimization took {stpw.Elapsed.ToString("hh\\:mm\\:ss\\.fff")}");
-                        PrintResult(percases);
+                        PrintResult(percases, argsuments.Item2.NumGallons, app.TotalGallons);
                     }
                     finally
                     {
@@ -88,12 +90,18 @@ namespace BackPackOptimizer.Clients.Console
             }
         }
 
-        static void PrintResult(Purchases p)
+        #region Command line handling
+        static void PrintResult(Purchases p, int requestedGallons, int totalGallons)
         {
-            System.Console.WriteLine(
-                $"Optimal purchases for {p.NumberOfGallons} with average price {p.AveragePriceOfGallon.ToString("#.##")} are:");
-            foreach (var m in p.Merchendises)
-                System.Console.WriteLine($"\t{m}");
+            if (p.Merchendises.Count == 0)
+                System.Console.WriteLine($"Suitable purchases are not found. Total gallons {totalGallons} is less than requested {requestedGallons}");
+            else
+            {
+                System.Console.WriteLine(
+                    $"Optimal purchases for {p.NumberOfGallons} with average price {p.AveragePriceOfGallon.ToString("#.##")} are:");
+                foreach (var m in p.Merchendises)
+                    System.Console.WriteLine($"\t{m}");
+            }
         }
 
         static Tuple<bool, ProgramArguments> ReadArguments(string[] args)
@@ -123,8 +131,16 @@ namespace BackPackOptimizer.Clients.Console
                 return new Tuple<bool, ProgramArguments>(false, default(ProgramArguments));
             }
 
+            if (numGallons < 1)
+            {
+                System.Console.WriteLine($"Error: Number of gallons should be a valid positive integer greater than 0: [{numGallons}].");
+                Environment.ExitCode = BadSize;
+                return new Tuple<bool, ProgramArguments>(false, default(ProgramArguments));
+            }
+
             return new Tuple<bool, ProgramArguments>(true, new ProgramArguments() { CsvFilePath = csvFilePath, NumGallons = numGallons });
         }
+        #endregion Command line handling
 
         static void PrintUsage()
         {

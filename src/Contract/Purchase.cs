@@ -6,7 +6,14 @@ namespace BackPackOptimizer.Contract
     {
         public string SourceName { get; set; }
         public int NumberOfGallons { get; set; }
-        public float PriceOfGallon { get; set; }
+        public double PriceOfGallon { get; set; }
+        
+        public Purchase(MerchendiseBulkItem bulkItem, int subIndex)
+        {
+            SourceName = bulkItem.Merchendise.Name;
+            NumberOfGallons = bulkItem.GetNthVolumeGallons(subIndex);
+            PriceOfGallon = bulkItem.Merchendise.AvgPrice;
+        }
 
         #region Object
         public override int GetHashCode()

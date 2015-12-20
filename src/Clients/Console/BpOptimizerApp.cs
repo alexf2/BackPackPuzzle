@@ -1,4 +1,5 @@
-﻿using BackPackOptimizer.Contract;
+﻿using System.Linq;
+using BackPackOptimizer.Contract;
 using System.Threading.Tasks;
 using DataProviders.Contract;
 
@@ -19,7 +20,9 @@ namespace BackPackOptimizer.Clients.Console
 
         public async Task<Purchases> Run()
         {
-            return await _optimizer.Solve(_provider.Merchendises, _backpackSize);
+            return await _optimizer.Solve(_provider.Merchendise, _backpackSize);
         }
+
+        public int TotalGallons => _provider.Merchendise.Sum((m) => m.Size);
     }
 }

@@ -45,10 +45,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BinomiaUnorderedFulllIterator.cs" />
     <Compile Include="BpoBase.cs" />
     <Compile Include="BpoBruteForce.cs" />
     <Compile Include="BpoDynamic.cs" />
     <Compile Include="BpoGreedy.cs" />
+    <Compile Include="CartesianProductIterator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

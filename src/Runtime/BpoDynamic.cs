@@ -12,12 +12,12 @@ namespace BackPackOptimizer.Runtime
         {
         }
 
-        public async Task<Purchases> Solve(IEnumerable<Merchendise> merchendises, int backpackSize)
+        public async Task<Purchases> Solve(IEnumerable<Merchendise> merchendises, int requiredGallons)
         {
             if (merchendises == null)
                 throw new ArgumentNullException(nameof(merchendises));
-            if (backpackSize < 1)
-                throw new ArgumentOutOfRangeException($"{nameof(backpackSize)} should be greater then zero");
+            if (requiredGallons < 1)
+                throw new ArgumentOutOfRangeException($"{nameof(requiredGallons)} should be greater then zero");
 
             return await Task.FromResult(CreateFullPurchasing(merchendises));
         }

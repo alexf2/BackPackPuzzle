@@ -10,7 +10,9 @@ using Wintellect.PowerCollections;
 namespace BackPackOptimizer.Runtime
 {
     public class BpoBase
-    {        
+    {
+        const int NotifyStepPercent = 10;
+
         protected readonly IProgress<ProgressInfo> _progress;
         protected readonly CancellationToken _cancelToken;
 
@@ -29,7 +31,7 @@ namespace BackPackOptimizer.Runtime
         protected Task<Purchases> CreateTestTask(IEnumerable<Merchendise> merchendises)
         {
             var m = merchendises.ToArray();            
-            int step = (int)Math.Ceiling(Math.Max(m.Length, 1) / 100M * 10M);
+            int step = (int)CalculateNotifyStep(m.Length);
 
             var task = Task<Purchases>.Factory.StartNew(() =>
             {
@@ -48,6 +50,11 @@ namespace BackPackOptimizer.Runtime
         protected void NotifyProgress(long iteration, long totalIterations)
         {
             _progress?.Report(new ProgressInfo {Iteration = iteration, TotalIterations = totalIterations});
+        }
+
+        protected static long CalculateNotifyStep(long totalTaskSize)
+        {
+            return (long)Math.Ceiling(Math.Max(totalTaskSize, 1L) / 100M * 10M);
         }
     }
 }

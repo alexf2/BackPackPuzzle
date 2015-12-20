@@ -7,16 +7,26 @@ using DataProviders.Contract;
 
 namespace DataProviders.CsvProvider
 {
+    /// <summary>
+    /// Represent read only merchendise provider against CSV files.
+    /// </summary>
     public sealed class CsvMerchendiseProvider: IMerchendiseProvider
     {
         readonly string _filePath;
 
+        /// <summary>
+        /// Initializes an instance of the provider.
+        /// </summary>
+        /// <param name="filePath">Path to a CSV file of predefined format, containing merchendise.</param>
         public CsvMerchendiseProvider(string filePath)
         {
             _filePath = filePath;
         }
 
-        public IEnumerable<Merchendise> Merchendises
+        /// <summary>
+        /// Returns a collection of merchendise, loaded from underlying storage.
+        /// </summary>
+        public IEnumerable<Merchendise> Merchendise
         {
             get
             {
@@ -31,13 +41,13 @@ namespace DataProviders.CsvProvider
                         {
                             Name = reader.GetField("Source Name"),
                             Size = reader.GetField<int>("Size"),
-                            AvgPrice = reader.GetField<decimal>("Average price of gallon"),
+                            AvgPrice = reader.GetField<double>("Average price of gallon"),
                             MinSize = reader.GetField<int>("Min size"),
                             IncrementStep = reader.GetField<int>("Step size")
                         };
 
                         var context = new ValidationContext(mc, null, null);
-                        Validator.ValidateObject(mc, context);
+                        Validator.ValidateObject(mc, context); //enforcing fields constraints
 
                         yield return mc;
                     }
