@@ -48,6 +48,7 @@
     <Compile Include="BinomiaUnorderedFulllIterator.cs" />
     <Compile Include="BpoBase.cs" />
     <Compile Include="BpoBruteForce.cs" />
+    <Compile Include="BpoBruteForce2.cs" />
     <Compile Include="BpoDynamic.cs" />
     <Compile Include="BpoGreedy.cs" />
     <Compile Include="CartesianProductIterator.cs" />

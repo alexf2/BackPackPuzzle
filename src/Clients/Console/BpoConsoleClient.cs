@@ -81,7 +81,7 @@ namespace BackPackOptimizer.Clients.Console
 
                     try
                     {
-                        System.Console.WriteLine($"Optimizing {Path.GetFileName(argsuments.Item2.CsvFilePath)} for {argsuments.Item2.NumGallons} gallons");
+                        System.Console.WriteLine($"Optimizing {Path.GetFileName(argsuments.Item2.CsvFilePath)} for {argsuments.Item2.NumGallons} gallons, using '{ConfigurationManager.AppSettings["algorithm"]}'");
 
                         stpw.Start();
                         var percases = app.Run().Result;
@@ -157,7 +157,7 @@ namespace BackPackOptimizer.Clients.Console
                 return new Tuple<bool, ProgramArguments>(false, default(ProgramArguments));
             }
 
-            return new Tuple<bool, ProgramArguments>(true, new ProgramArguments() { CsvFilePath = csvFilePath, NumGallons = numGallons });
+            return new Tuple<bool, ProgramArguments>(true, new ProgramArguments() { CsvFilePath = csvFilePath, NumGallons = numGallons, SolveMinimizationTask = solveMinimization });
         }
         #endregion Command line handling
 
