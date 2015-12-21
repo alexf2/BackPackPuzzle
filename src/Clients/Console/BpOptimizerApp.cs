@@ -10,17 +10,19 @@ namespace BackPackOptimizer.Clients.Console
         readonly IBackpackOptimizer _optimizer;
         readonly IMerchendiseProvider _provider;
         readonly int _backpackSize;
+        readonly bool _solveMinimization;
 
-        public BpOptimizerApp(IBackpackOptimizer optimizer, IMerchendiseProvider provider, int backpackSize)
+        public BpOptimizerApp(IBackpackOptimizer optimizer, IMerchendiseProvider provider, int backpackSize, bool solveMinimization)
         {
             _optimizer = optimizer;
             _provider = provider;
             _backpackSize = backpackSize;
+            _solveMinimization = solveMinimization;
         }
 
         public async Task<Purchases> Run()
         {
-            return await _optimizer.Solve(_provider.Merchendise, _backpackSize);
+            return await _optimizer.Solve(_provider.Merchendise, _backpackSize, _solveMinimization);
         }
 
         public int TotalGallons => _provider.Merchendise.Sum((m) => m.Size);

@@ -7,6 +7,6 @@ namespace BackPackOptimizer.Contract
 {
     public interface IBackpackOptimizer
     {
-        Task<Purchases> Solve(IEnumerable<Merchendise> merchendises, int requiredGallons);
+        Task<Purchases> Solve(IEnumerable<Merchendise> merchendises, int requiredGallons, bool solveMinimization);
     }
 }

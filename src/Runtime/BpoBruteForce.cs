@@ -14,7 +14,7 @@ namespace BackPackOptimizer.Runtime
         {            
         }
 
-        public Task<Purchases> Solve(IEnumerable<Merchendise> merchendises, int requiredGallons)
+        public Task<Purchases> Solve(IEnumerable<Merchendise> merchendises, int requiredGallons, bool solveMinimization)
         {
             if (merchendises == null)
                 throw new ArgumentNullException(nameof(merchendises));
@@ -45,7 +45,7 @@ namespace BackPackOptimizer.Runtime
                 long notifyStep = CalculateNotifyStep(totalIterations);
 
                 int[] solutionItemIndexes = null, solutionItemSubIndexes = null;
-                double solutionCost = double.MaxValue;
+                double solutionCost = solveMinimization ? double.MaxValue:double.MinValue;
                 int solutionGallons = 0;
 
                 long iterCount = 0;
@@ -62,7 +62,7 @@ namespace BackPackOptimizer.Runtime
                         int amountGallons;
                         CalculateCombinationCost(items, combinationIdx, cartesianSelection, out cost, out amountGallons);
 
-                        if (amountGallons >= requiredGallons && cost < solutionCost)
+                        if (solveMinimization ? (amountGallons >= requiredGallons && cost < solutionCost):(amountGallons <= requiredGallons && cost > solutionCost))
                         {
                             solutionItemIndexes = (int[])combinationIdx.Clone();
                             solutionItemSubIndexes = (int[])cartesianSelection.Clone();

@@ -17,10 +17,11 @@ namespace BackPackOptimizer.Clients.Console
                 Classes.FromAssemblyContaining<BpoBase>()
                     .Where(t => t.Name.Equals(ConfigurationManager.AppSettings["algorithm"], StringComparison.Ordinal))
                     .WithService.FirstInterface().LifestyleTransient()
-                    .Configure((cr) => cr.DynamicParameters((kernel, dic) =>
+                    /*.Configure((cr) => cr.DynamicParameters((kernel, dic) =>
                     {
                         dic["backpackSize"] = kernel.Resolve<BpoConsoleClient.ProgramArguments>().NumGallons;
-                    })),
+                        dic["solveMinimization"] = kernel.Resolve<BpoConsoleClient.ProgramArguments>().SolveMinimizationTask;
+                    }))*/,
                         
 
                 Component.For<IMerchendiseProvider>().ImplementedBy(Type.GetType(ConfigurationManager.AppSettings["data-provider"])).LifestyleTransient()

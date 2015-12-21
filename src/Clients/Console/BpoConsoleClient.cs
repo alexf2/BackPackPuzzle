@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Configuration;
 using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
@@ -14,12 +16,22 @@ namespace BackPackOptimizer.Clients.Console
         const int BadArgs = -1;
         const int NoFile = -2;
         const int BadSize = -3;
+        const int BadMinimizationFlag = -4;
         const int GenericException = -100;
 
         internal sealed class ProgramArguments
         {
             public string CsvFilePath;
             public int NumGallons;
+            public bool SolveMinimizationTask;
+
+            public Dictionary<string, object> ToDictionary() => new Dictionary<string, object>
+            {
+                //Dictionary keys should match to constructor arguments' names in the dependency tree
+                {"filePath", CsvFilePath},
+                {"backpackSize", NumGallons},
+                {"solveMinimization", SolveMinimizationTask}
+            };
         }
         
         public static void Main(string[] args)
@@ -58,12 +70,12 @@ namespace BackPackOptimizer.Clients.Console
                 
                 if (argsuments.Item1)
                 {
-                    //publishing arguments to IoC container
+                    //publishing arguments to IoC container: they are used in DynamicParameters, at lower levels of the dependencies tree 
                     container.Register(Component.For<ProgramArguments>().Instance(argsuments.Item2).LifestyleSingleton());
 
                     var stpw = new Stopwatch();
 
-                    var app = container.Resolve<BpOptimizerApp>(new { filePath = argsuments.Item2.CsvFilePath, backpackSize = argsuments.Item2.NumGallons });
+                    var app = container.Resolve<BpOptimizerApp>(argsuments.Item2.ToDictionary() /*passing scalar type dependencies to the roor object*/);
                     var execContext = container.Resolve<IExecutionContext>();
                     execContext.StartReading(); //starting keyboard control
 
@@ -113,6 +125,7 @@ namespace BackPackOptimizer.Clients.Console
 
             var csvFilePath = args[0];
             var numGallonsArg = args[1];
+            var solveMinimizationArg = ConfigurationManager.AppSettings["solve-mimization-task"];
 
             if (!File.Exists(csvFilePath))
             {
@@ -133,6 +146,14 @@ namespace BackPackOptimizer.Clients.Console
             {
                 System.Console.WriteLine($"Error: Number of gallons should be a valid positive integer greater than 0: [{numGallons}].");
                 Environment.ExitCode = BadSize;
+                return new Tuple<bool, ProgramArguments>(false, default(ProgramArguments));
+            }
+
+            bool solveMinimization;
+            if (!bool.TryParse(solveMinimizationArg, out solveMinimization))
+            {
+                System.Console.WriteLine($"Error: solve-mimization-task appSettings config parameter has an invalid value: [{solveMinimizationArg}].");
+                Environment.ExitCode = BadMinimizationFlag;
                 return new Tuple<bool, ProgramArguments>(false, default(ProgramArguments));
             }
 

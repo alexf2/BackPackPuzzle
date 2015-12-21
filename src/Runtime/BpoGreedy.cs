@@ -14,7 +14,7 @@ namespace BackPackOptimizer.Runtime
         {
         }
 
-        public Task<Purchases> Solve(IEnumerable<Merchendise> merchendises, int requiredGallons)
+        public Task<Purchases> Solve(IEnumerable<Merchendise> merchendises, int requiredGallons, bool solveMinimization)
         {
             if (merchendises == null)
                 throw new ArgumentNullException(nameof(merchendises));
@@ -31,7 +31,7 @@ namespace BackPackOptimizer.Runtime
 
             long notifyStep = CalculateNotifyStep(items.Length);
             NotifyProgress("Sorting...");
-            Array.Sort(items, MerchendiseBulkItem.CostOrder);
+            Array.Sort(items, solveMinimization ? MerchendiseBulkItem.CostOrder: MerchendiseBulkItem.CostOrderDesc);
 
             return Task<Purchases>.Factory.StartNew(() =>
             {

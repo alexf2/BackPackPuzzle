@@ -13,7 +13,7 @@ namespace BackPackOptimizer.Runtime
         {
         }
 
-        public Task<Purchases> Solve(IEnumerable<Merchendise> merchendises, int requiredGallons)
+        public Task<Purchases> Solve(IEnumerable<Merchendise> merchendises, int requiredGallons, bool solveMinimization)
         {
             if (merchendises == null)
                 throw new ArgumentNullException(nameof(merchendises));
