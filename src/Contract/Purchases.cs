@@ -24,7 +24,15 @@ namespace BackPackOptimizer.Contract
             if (p == null)
                 throw new ArgumentNullException(nameof(p));
 
-            Merchendises.Add(p);
+            if (Merchendises.Contains(p))
+            {
+                Purchase tmp = Merchendises[ Merchendises.IndexOf(p) ];
+                Merchendises.Remove(p);
+                tmp.NumberOfGallons += p.NumberOfGallons;
+                Merchendises.Add(tmp);
+            }
+            else
+                Merchendises.Add(p);
 
             if (_totalGallons.HasValue)
                 _totalGallons += p.NumberOfGallons;

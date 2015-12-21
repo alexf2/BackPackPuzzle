@@ -4,7 +4,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using BackPackOptimizer.Contract;
 using DataProviders.Contract;
-using Wintellect.PowerCollections;
 
 namespace BackPackOptimizer.Runtime
 {
@@ -23,13 +22,15 @@ namespace BackPackOptimizer.Runtime
 
             //return await Task.FromResult(CreateFullPurchasing(merchendises));
             
+
             MerchendiseBulkItem[] items = MerchendiseBulkItem.ToBulkItems(merchendises);
+            //NegateCost(items);
 
             var instantPurchases = TryInstantSolution(items, requiredGallons);
             if (instantPurchases != null) //the task is either: has an obvious solution or doesn't have any solution
                 return Task.FromResult(instantPurchases);
 
-            //NegateCost(items);
+            
 
             long totalIterations = ((long)requiredGallons + 1L) * (long)items.Length;
             long notifyStep = CalculateNotifyStep(totalIterations);
@@ -65,6 +66,7 @@ namespace BackPackOptimizer.Runtime
                     }
 
                 FinalNotify();
+                //NegateCost(items);
                 return ic[ requiredGallons ];
 
             }, _cancelToken);
@@ -72,8 +74,19 @@ namespace BackPackOptimizer.Runtime
 
         void NegateCost (IEnumerable<MerchendiseBulkItem> items)
         {
+            //foreach (var item in items)
+                //item.Merchendise.AvgPrice = -item.Merchendise.AvgPrice;
+
+            double avg = (items.Min(i => i.Merchendise.AvgPrice) + items.Max(i => i.Merchendise.AvgPrice)) / 2.0;
+            
             foreach (var item in items)
-                item.Merchendise.AvgPrice = -item.Merchendise.AvgPrice;
+                if (item.Merchendise.AvgPrice > avg)
+                    item.Merchendise.AvgPrice = avg - 2*(item.Merchendise.AvgPrice - avg);
+                else if (item.Merchendise.AvgPrice < avg)
+                    item.Merchendise.AvgPrice = avg + 2*(avg - item.Merchendise.AvgPrice);
+
+            //foreach (var item in items)
+                //Console.WriteLine($"{item.Merchendise.Name}: {item.Merchendise.AvgPrice}");
         }
     }
 }
