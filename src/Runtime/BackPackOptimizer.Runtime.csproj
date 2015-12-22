@@ -52,6 +52,7 @@
     <Compile Include="BpoDynamic.cs" />
     <Compile Include="BpoGreedy.cs" />
     <Compile Include="CartesianProductIterator.cs" />
+    <Compile Include="CommonFactor.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

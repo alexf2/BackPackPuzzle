@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using BackPackOptimizer.Contract;
 using DataProviders.Contract;
+using Wintellect.PowerCollections;
 
 namespace BackPackOptimizer.Runtime
 {
@@ -20,63 +21,98 @@ namespace BackPackOptimizer.Runtime
             if (requiredGallons < 1)
                 throw new ArgumentOutOfRangeException($"{nameof(requiredGallons)} should be greater then zero");
 
-            //return await Task.FromResult(CreateFullPurchasing(merchendises));
-            
+                        
 
+            MerchendiseBulkItem[] itemsOrig = MerchendiseBulkItem.ToBulkItems(merchendises);
             MerchendiseBulkItem[] items = MerchendiseBulkItem.ToBulkItems(merchendises);
-            //NegateCost(items);
+            if (solveMinimization)
+                NegateCost(items);
+            NormalizeCosts(items);
 
             var instantPurchases = TryInstantSolution(items, requiredGallons);
             if (instantPurchases != null) //the task is either: has an obvious solution or doesn't have any solution
                 return Task.FromResult(instantPurchases);
-
-            
-
-            long totalIterations = ((long)requiredGallons + 1L) * (long)items.Length;
-            long notifyStep = CalculateNotifyStep(totalIterations);
+                        
 
             return Task<Purchases>.Factory.StartNew(() =>
-            {                
-                Purchases[] ic = new Purchases[requiredGallons + 1];
-                for (int i = 0; i < ic.Length; i++)
-                    ic[ i ] = new Purchases();
+            {
+                int N = items.Length;
 
+                long totalIterations = (long)(requiredGallons + 1) * (long)N;
+                long notifyStep = CalculateNotifyStep(totalIterations);
                 long iterCount = 0;
-                for (int i = 0; i < items.Length; i++)
-                    for (int j = requiredGallons; j >= 0; j--) //capacity
+
+                int[] opts = new int[N + 1];
+                int[] P = new int[N + 1]; P[ 0 ] = 1;
+                int choose = 0;
+
+                for (int j = 0; j < N; j++)
+                {
+                    var merch = items[ j ];
+
+                    opts[j + 1] = opts[j] + merch.SubItemsCount;
+                    P[j + 1] = P[ j ]*(1 + merch.SubItemsCount);
+                }
+
+                int[,] m = (int[,])Array.CreateInstance(typeof(int), new[] { requiredGallons + 1, opts[N] + 1 });
+                int[,] b = (int[,])Array.CreateInstance(typeof(int), new[] { requiredGallons + 1, opts[N] + 1 });                
+
+                for (int w = 1; w <= requiredGallons; w++)
+                    for (int j = 0; j < N; j++)
                     {
                         if (++iterCount % notifyStep == 0)
                             NotifyProgress(iterCount, totalIterations);
 
                         _cancelToken.ThrowIfCancellationRequested();
 
-                        var item = items[ i ];
+                        var merch = items[ j ];
+                        int @base = opts[ j ];
 
-                        if (j >= item.Merchendise.MinSize)
+                        for (int n = 1; n <= merch.SubItemsCount; n++)
                         {
-                            int quantity = Math.Min(item.Merchendise.Size, j / item.Merchendise.MinSize);
-                            for (int k = item.Merchendise.MinSize; k <= quantity; k += item.Merchendise.IncrementStep)
-                            {
-                                Purchases pchLighter = ic[ j - k ];
-                                double testValue = pchLighter.TotalCost + k * item.Merchendise.AvgPrice;
-                                if (testValue > ic[j].TotalCost)
-                                    (ic[ j ] = (Purchases)pchLighter.Clone()).Add(new Purchase() { SourceName = item.Merchendise.Name, NumberOfGallons = k, PriceOfGallon = item.Merchendise.AvgPrice}); 
-                            }
+                            int W = merch.GetNthVolumeGallons(n - 1),
+                                s = w >= W ? 1 : 0,
+                                v = s * GetNormalizedCost(merch, n - 1),
+                                I = @base + n,
+                                wN = w - s*W,
+                                C = n*P[j] + b[wN, @base];
+
+                            m[w, I] = Math.Max(m[w, I - 1], v + m[wN, @base]);
+                            choose = b[w, I] = (m[w, I] > m[w, I - 1] ? C : b[w, I - 1]);
                         }
                     }
 
-                FinalNotify();
-                //NegateCost(items);
-                return ic[ requiredGallons ];
+                int[] best = new int[ N ];
+                for (int j = N - 1; j >= 0; j--)
+                {
+                    best[ j ] = (int)Math.Floor((double)choose / P[j]);
+                    choose -= best[j] * P[j];
+                }
 
+                var resSet = new OrderedBag<Purchase>();
+                if (best.Any( i => i != 0))
+                    for (int i = 0; i < N; i++)
+                    {
+                        if (best[i] == 0)
+                            continue;
+
+                        var merch = itemsOrig[ i ].Merchendise;
+                        resSet.Add(new Purchase() {SourceName = merch.Name, NumberOfGallons = itemsOrig[ i ].GetNthVolumeGallons(best[i] - 1), PriceOfGallon = merch.AvgPrice});
+                    }
+
+                FinalNotify();                
+                
+                return new Purchases(resSet);
             }, _cancelToken);
         }
 
-        void NegateCost (IEnumerable<MerchendiseBulkItem> items)
+        static int GetNormalizedCost(MerchendiseBulkItem m, int number)
         {
-            //foreach (var item in items)
-                //item.Merchendise.AvgPrice = -item.Merchendise.AvgPrice;
+            return (int) (m.GetNthPrice(number)*100.0);
+        }
 
+        static void NegateCost (IEnumerable<MerchendiseBulkItem> items)
+        {            
             double avg = (items.Min(i => i.Merchendise.AvgPrice) + items.Max(i => i.Merchendise.AvgPrice)) / 2.0;
             
             foreach (var item in items)
@@ -87,6 +123,13 @@ namespace BackPackOptimizer.Runtime
 
             //foreach (var item in items)
                 //Console.WriteLine($"{item.Merchendise.Name}: {item.Merchendise.AvgPrice}");
+        }
+
+        static void NormalizeCosts (IList<MerchendiseBulkItem> items)
+        {
+            long cf = CommonFactor.Calculate(items, (item) => (long) (item.Merchendise.AvgPrice*100.0), items.Count);
+            foreach (var item in items)            
+                item.Merchendise.AvgPrice = (long)(item.Merchendise.AvgPrice*100.0) / cf;
         }
     }
 }
