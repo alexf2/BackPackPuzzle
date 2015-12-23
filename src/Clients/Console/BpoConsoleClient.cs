@@ -11,6 +11,9 @@ using Castle.Windsor.Installer;
 
 namespace BackPackOptimizer.Clients.Console
 {
+    /// <summary>
+    /// A console client for the optimizer application. Implements the composition root.
+    /// </summary>
     class BpoConsoleClient
     {
         const int BadArgs = -1;
@@ -21,9 +24,9 @@ namespace BackPackOptimizer.Clients.Console
 
         internal sealed class ProgramArguments
         {
-            public string CsvFilePath;
-            public int NumGallons;
-            public bool SolveMinimizationTask;
+            public string CsvFilePath; //the first command line argument
+            public int NumGallons; //the second command line argument
+            public bool SolveMinimizationTask; //is in app.config
 
             public Dictionary<string, object> ToDictionary() => new Dictionary<string, object>
             {

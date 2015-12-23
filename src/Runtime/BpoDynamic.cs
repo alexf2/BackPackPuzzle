@@ -8,6 +8,10 @@ using Wintellect.PowerCollections;
 
 namespace BackPackOptimizer.Runtime
 {
+    /// <summary>
+    /// Implements Dynamic Programming algorithm to solve Backpack optimization task.
+    /// Takes O(N * M).
+    /// </summary>
     public sealed class BpoDynamic : BpoBase, IBackpackOptimizer
     {
         public BpoDynamic(IExecutionContext context) : base(context)
@@ -36,14 +40,15 @@ namespace BackPackOptimizer.Runtime
 
             return Task<Purchases>.Factory.StartNew(() =>
             {
-                int N = items.Length;
+                int N = items.Length; //spicies number
 
+                //progress parameters
                 long totalIterations = (long)(requiredGallons + 1) * (long)N;
                 long notifyStep = CalculateNotifyStep(totalIterations);
                 long iterCount = 0;
 
                 int[] opts = new int[N + 1];
-                int[] P = new int[N + 1]; P[ 0 ] = 1;
+                int[] P = new int[N + 1]; P[ 0 ] = 1; //item encoding
                 int choose = 0;
 
                 for (int j = 0; j < N; j++)
@@ -54,8 +59,8 @@ namespace BackPackOptimizer.Runtime
                     P[j + 1] = P[ j ]*(1 + merch.SubItemsCount);
                 }
 
-                int[,] m = (int[,])Array.CreateInstance(typeof(int), new[] { requiredGallons + 1, opts[N] + 1 });
-                int[,] b = (int[,])Array.CreateInstance(typeof(int), new[] { requiredGallons + 1, opts[N] + 1 });                
+                int[,] m = (int[,])Array.CreateInstance(typeof(int), new[] { requiredGallons + 1, opts[N] + 1 }); //maximum pack
+                int[,] b = (int[,])Array.CreateInstance(typeof(int), new[] { requiredGallons + 1, opts[N] + 1 }); //best selection 
 
                 for (int w = 1; w <= requiredGallons; w++)
                     for (int j = 0; j < N; j++)
@@ -66,24 +71,24 @@ namespace BackPackOptimizer.Runtime
                         _cancelToken.ThrowIfCancellationRequested();
 
                         var merch = items[ j ];
-                        int @base = opts[ j ];
+                        int @base = opts[ j ]; //item index for 0
 
                         for (int n = 1; n <= merch.SubItemsCount; n++)
                         {
-                            int W = merch.GetNthVolumeGallons(n - 1),
-                                s = w >= W ? 1 : 0,
-                                v = s * GetNormalizedCost(merch, n - 1),
-                                I = @base + n,
-                                wN = w - s*W,
-                                C = n*P[j] + b[wN, @base];
+                            int W = merch.GetNthVolumeGallons(n - 1), //calculate selected weight (gallons amount)
+                                s = w >= W ? 1 : 0, //checking whether it fits into current backpack size
+                                v = s * GetNormalizedCost(merch, n - 1), //calculating the cost for selected amount
+                                I = @base + n, //item number for the selection
+                                wN = w - s*W, //calculating how much other species we could add
+                                C = n*P[j] + b[wN, @base]; //encoded combination
 
-                            m[w, I] = Math.Max(m[w, I - 1], v + m[wN, @base]);
+                            m[w, I] = Math.Max(m[w, I - 1], v + m[wN, @base]); //most optimal value
                             choose = b[w, I] = (m[w, I] > m[w, I - 1] ? C : b[w, I - 1]);
                         }
                     }
 
                 int[] best = new int[ N ];
-                for (int j = N - 1; j >= 0; j--)
+                for (int j = N - 1; j >= 0; j--) //calculating selection indexes (for each merchendise whether it is taken (< 0) and how many items/gallons)
                 {
                     best[ j ] = (int)Math.Floor((double)choose / P[j]);
                     choose -= best[j] * P[j];

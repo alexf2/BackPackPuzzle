@@ -3,6 +3,10 @@ using System.Collections.Generic;
 
 namespace BackPackOptimizer.Runtime
 {
+    /// <summary>
+    /// Iterates over Cartesian product of arrays.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
     public sealed class CartesianProductIterator<T>
     {
         T[][] _arrays;
@@ -17,6 +21,9 @@ namespace BackPackOptimizer.Runtime
             _arrays = arrays;
         }
 
+        /// <summary>
+        /// Calculates Cartesian product power.
+        /// </summary>
         public long TotalCombinationsCount  {
             get {
                 int res = 1;
@@ -26,6 +33,10 @@ namespace BackPackOptimizer.Runtime
             }
         }
 
+        /// <summary>
+        /// Performs the iteration.
+        /// </summary>
+        /// <returns>Cartesian product of arrays.</returns>
         public IEnumerable<int[]> Iterate()
         {
             int[] index = new int[ _arrays.Length ];

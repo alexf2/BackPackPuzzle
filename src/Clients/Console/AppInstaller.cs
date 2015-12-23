@@ -9,6 +9,9 @@ using DataProviders.Contract;
 
 namespace BackPackOptimizer.Clients.Console
 {
+    /// <summary>
+    /// Implements configuration for the IoC container.
+    /// </summary>
     public sealed class AppInstaller: IWindsorInstaller
     {
         public void Install(IWindsorContainer container, IConfigurationStore store)

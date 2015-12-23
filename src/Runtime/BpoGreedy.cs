@@ -8,6 +8,10 @@ using Wintellect.PowerCollections;
 
 namespace BackPackOptimizer.Runtime
 {
+    /// <summary>
+    /// Implements Greedy algorithm to solve Backpack optimization task.
+    /// This method is really quick, but inexact. Takes O(lg N) + N.
+    /// </summary>
     public sealed class BpoGreedy : BpoBase, IBackpackOptimizer
     {
         public BpoGreedy(IExecutionContext context) : base(context)

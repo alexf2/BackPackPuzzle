@@ -1,5 +1,8 @@
 ﻿namespace BackPackOptimizer.Contract
 {
+    /// <summary>
+    /// Represent a piece of data to report about the progress.
+    /// </summary>
     public class ProgressInfo
     {
         public long Iteration { get; set; }

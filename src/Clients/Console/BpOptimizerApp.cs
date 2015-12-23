@@ -5,6 +5,9 @@ using DataProviders.Contract;
 
 namespace BackPackOptimizer.Clients.Console
 {
+    /// <summary>
+    /// Represents optimizator application.
+    /// </summary>
     public sealed class BpOptimizerApp
     {
         readonly IBackpackOptimizer _optimizer;

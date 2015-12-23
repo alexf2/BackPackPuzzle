@@ -4,6 +4,9 @@ using Wintellect.PowerCollections;
 
 namespace BackPackOptimizer.Contract
 {
+    /// <summary>
+    /// Represents a complete set of purchases.
+    /// </summary>
     public sealed class Purchases: ICloneable
     {
         public Purchases()
@@ -49,13 +52,25 @@ namespace BackPackOptimizer.Contract
         }
 
         int? _totalGallons;
+        /// <summary>
+        /// Return total items number.
+        /// </summary>
         public int TotalGallons => _totalGallons ?? (_totalGallons = Merchendises.Sum(pc => pc.NumberOfGallons)).Value;
 
+        /// <summary>
+        /// Returns the detailed list of ourchases.
+        /// </summary>
         public OrderedBag<Purchase> Merchendises { get; private set; }
 
         double? _averagePriceOfGallon;
+        /// <summary>
+        /// Returns cost of one item.
+        /// </summary>
         public double AveragePriceOfGallon => _averagePriceOfGallon ?? (_averagePriceOfGallon = Merchendises.Average(pc => pc.PriceOfGallon)).Value;
 
+        /// <summary>
+        /// Returns overall purchase cost.
+        /// </summary>
         public double TotalCost => Merchendises.Count == 0 ? 0:AveragePriceOfGallon * TotalGallons;
     }
 }

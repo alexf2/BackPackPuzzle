@@ -2,10 +2,22 @@
 
 namespace BackPackOptimizer.Contract
 {
+    /// <summary>
+    /// Represents an end user recommendation regarding buying a particular merchendise item: what item and how many items to buy. 
+    /// </summary>
     public struct Purchase: IComparable<Purchase>, IComparable, IEquatable<Purchase>
     {
+        /// <summary>
+        /// Item name.
+        /// </summary>
         public string SourceName { get; set; }
+        /// <summary>
+        /// Items count.
+        /// </summary>
         public int NumberOfGallons { get; set; }
+        /// <summary>
+        /// Cost of one item.
+        /// </summary>
         public double PriceOfGallon { get; set; }
         
         public Purchase(MerchendiseBulkItem bulkItem, int subIndex)

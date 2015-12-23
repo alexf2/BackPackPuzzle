@@ -7,6 +7,10 @@ using Wintellect.PowerCollections;
 
 namespace BackPackOptimizer.Runtime
 {
+    /// <summary>
+    /// Implements full iteration of all possible selections to solve Backpack optimization task.
+    /// Is really costy regarding to the CPU time.
+    /// </summary>
     public class BpoBruteForce: BpoBase, IBackpackOptimizer
     {        
         public BpoBruteForce(IExecutionContext context) : base(context)

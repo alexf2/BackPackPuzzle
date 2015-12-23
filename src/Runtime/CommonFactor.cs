@@ -3,6 +3,9 @@ using System.Collections.Generic;
 
 namespace BackPackOptimizer.Runtime
 {
+    /// <summary>
+    /// A helper to compute common factor for integers.
+    /// </summary>
     public static class CommonFactor
     {
         public static long Calculate (long a, long b)
