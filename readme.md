@@ -12,6 +12,7 @@
 Лишних пиастров у Джека никогда не бывает, поэтому он хочет минимизировать свои расходы. Напишите Java программу, которая реализует интерфейс JackSparrowHelper.
 
 **P.S.** Программа должна быть понятно написана
+
 **P.P.S.** Программа будет протестирована с использованием не только приложенного, но и другого csv файла, имеющего тот же формат.
 
 ```Java
@@ -48,7 +49,7 @@ public interface JackSparrowHelper {
     Purchases helpJackSparrow(String path, int numberOfGallons);
 }
 ```
-**Пример исходных данных**
+**Пример исходных данных (CSV)**
 ```CSV
 Source Name;Size;Average price of gallon;Min size;Step size
 Mulroy;50;50.0;1;1
