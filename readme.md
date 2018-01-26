@@ -59,4 +59,5 @@ Davy Jones;100;51.0;100;100
 Hector Barbossa;300;50.5;200;100
 Kraken;200;54.0;200;200
 ```
-
+**Диаграмма классов**
+![Class Diagram](./src/ClassDiagram1.png "Диаграмма классов")
